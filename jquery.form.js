@@ -84,7 +84,7 @@ $.fn.ajaxSubmit = function(options) {
         return this;
     }
 
-    var method, action, url, $form = this;
+    var method, action, url, $form = this, context;
 
     if (typeof options == 'function') {
         options = { success: options };
@@ -95,6 +95,7 @@ $.fn.ajaxSubmit = function(options) {
 
     method = options.type || this.attr2('method');
     action = options.url  || this.attr2('action');
+    context = options.context || this;
 
     url = (typeof action === 'string') ? $.trim(action) : '';
     url = url || window.location.href || '';
@@ -120,7 +121,7 @@ $.fn.ajaxSubmit = function(options) {
     }
 
     // provide opportunity to alter form data before it is serialized
-    if (options.beforeSerialize && options.beforeSerialize(this, options) === false) {
+    if (options.beforeSerialize && options.beforeSerialize.call(context, this, options) === false) {
         log('ajaxSubmit: submit aborted via beforeSerialize callback');
         return this;
     }
@@ -138,7 +139,7 @@ $.fn.ajaxSubmit = function(options) {
     }
 
     // give pre-submit callback an opportunity to abort the submit
-    if (options.beforeSubmit && options.beforeSubmit(a, this, options) === false) {
+    if (options.beforeSubmit && options.beforeSubmit.call(context, a, this, options) === false) {
         log('ajaxSubmit: submit aborted via beforeSubmit callback');
         return this;
     }
